@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Next Gen Java</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Next Gen Java</h1>
+					<img width="365" height="365" data-src="res/lambda.svg" alt="lambda icon" style="background: none; border: none; box-shadow: none; margin: 0">
+					<p>
+						Lambdas, Streams and functional programming in Java 8
+					</p>
+					<p>
+						<small>Andrew Hamilton</small>
+					</p>
+				</section>
+				<section>
+					<h2>Methods as first-class citizens</h2>
+					<pre><code data-trim>
+Function&lt;String, String&gt; louder1 = new Function&lt;String, String&gt;() {
+    public String apply(String string) {
+      return string.toUpperCase();
+    }
+};
+
+System.out.println(louder1.apply("String One")); // STRING ONE
+					</code></pre>
+				</section>
+				<section>
+					<h2>Expressed as a Lambda</h2>
+					
+					<pre><code data-trim>
+Function&lt;String, String&gt; louder2 = (String s) -> s.toUpperCase();
+
+System.out.println(louder2.apply("String Two")); // STRING TWO
+					</code></pre>
+					<div class="fragment">
+						<h2>...or a method reference</h2>
+					
+					<pre><code data-trim>
+Function&lt;String, String&gt; louder3 = String::toUpperCase;
+
+System.out.println(louder3.apply("String Three")); // STRING THREE
+					</code></pre>
+					</div>
+				</section>	
+				<section>
+					<section>
+						<h2>Anatomy of a Lambda</h2>
+						<ul>
+							<li>Basically an anonymous function.</li>
+							<li>Usually one line, but can be a full block.</li>
+							<li>Can take 0...n parameters.</li>
+							<li>Can return void or a value.</li>
+						</ul>
+						<pre><code data-trim>
+List&lt;String&gt; list = Arrays.asList("C", "A", "a", "D", "B");
+
+// A comparator that compares uppercase versions of each item
+list.sort((a, b) -> a.toUpperCase().compareTo(b.toUpperCase()));
+
+list.forEach(System.out::print); // AaBCD
+						</code></pre>
+					</section>
+					<section>
+						<h2>Functions</h2>
+						<p>(★) -> ★<br/>Transform one value into another</p>
+						<pre><code data-trim>
+// Lambda function
+Function&lt;String, Integer&gt; length = (String s) -> s.length();
+
+// Method reference
+Function&lt;Integer, String&gt; valueOfInt = String::valueOf;
+						</code></pre>
+					</section>
+					<section>
+						<h2>Predicates</h2>
+						<p>(★) -> ✓/✗<br />Decide if a value passes or fails a condition</p>
+						<pre><code data-trim>
+// Lambda function
+Predicate&lt;String&gt; isInteger = (String s) -> s.matches("-?\\d+");
+
+// Method reference
+Predicate&lt;Collection&gt; isEmpty = Collection::isEmpty;
+						</code></pre>
+						<p></p>
+					</section>
+					<section>
+						<h2>Consumers</h2>
+						<p>(★) -><br />Recieve a value for output or transfer</p>
+						<pre><code data-trim>
+// Lambda function
+Consumer&lt;String&gt; consumer = (String s) -> System.out.println(s))
+
+// Method reference
+List&lt;String&gt; myList = new ArrayList&lt;&gt;();
+Consumer&lt;String&gt; consumer = myList::add;
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<h2>...so we have</h2>
+					<ul>
+						<li>Suppliers for providing input values</li>
+						<li>Predicates for assessing conditions</li>
+						<li>Functions for transforming values</li>
+						<li>Consumers for accepting output values</li>
+					</ul>
+					<p>How can we chain them together?</p>
+				</section>
+				<section>
+					<h2>An example from GetBooking</h2>
+					<pre><code data-trim>
+for (Coupon coupon : coupons)
+{
+  if (Status.VoidCp != coupon.getStatus())
+  {
+    for (Segment segment : segments)
+    {
+      if (segment.isFlight())
+      {
+        FlightSegment flightSegment = (FlightSegment) segment;
+        if (coupon.matchesFlightSegment(flightSegment))
+        {
+          coupon.addFlightSegment(flightSegment);
+        }
+      }
+    }
+  }
+}
+					</code></pre>
+				</section>
+				<section>
+					<h2>Using streams instead</h2>
+					<pre><code data-trim>
+coupons.stream() // Stream of coupons
+  .filter((coupon) -> coupon.getStatus() != Status.VoidCp) // Predicate
+  .forEach((coupon) -> // Consumer
+  {
+    segments.stream() // Stream of segments
+      .filter(Segment::isFlight) // Predicate
+      .map((segment -> (FlightSegment) segment)) // Function
+      .filter(coupon::matchesFlightSegment) // Predicate
+      .forEach(coupon::addFlightSegment); // Consumer
+  });
+					</code></pre>
+				</section>
+				<section>
+					<h2>Property mapping in unit tests</h2>
+					<div class="fragment">
+						<p>with FEST</p>
+						<pre><code data-trim>
+assertThat(choiceBeans).extracting("choice")
+  .contains(Choice.keep, Choice.change, Choice.cancel);
+						</code></pre>
+					</div>
+					<div class="fragment">
+						<p>with AspectJ</p>
+						<pre><code data-trim>
+assertThat(choiceBeans).extracting(ChoiceBean::getChoice)
+  .contains(Choice.keep, Choice.change, Choice.cancel);
+						</code></pre>
+					</div>
+				</section>
+				<section>
+					<section>
+						<h2>Imperative loop flow</h2>
+						<pre><code data-trim>
+List&lt;String&gt; originals = Arrays.asList("One", "Two", "Three");
+List&lt;String&gt; replacements = new ArrayList&lt;&gt;();
+for (String original : originals) {
+  String replacement = original.replace("e", "i");
+  System.out.println(original + " becomes " + replacement);
+  replacements.add(replacement);
+}
+List&lt;String&gt; louder = new ArrayList&lt;&gt;();
+for (String replacement : replacements) {
+  String upperCase = replacement.toUpperCase();
+  System.out.println(replacement + " becomes " + upperCase);
+  louder.add(upperCase);
+}
+louder.forEach(System.out::println);
+						</code></pre>
+					</section>
+					<section>
+						<h2>...loops are run in order</h2>
+						<pre><code data-trim>
+// One becomes Oni
+// Two becomes Two
+// Three becomes Thrii
+// Oni becomes ONI
+// Two becomes TWO
+// Thrii becomes THRII
+// ONI
+// TWO
+// THRII
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Functional stream flow</h2>
+						<pre><code data-trim>
+Arrays.asList("One", "Two", "Three").stream().map((original -> {
+  String replacement = original.replace("e", "i");
+  System.out.println(original + " becomes " + replacement);
+  return replacement;
+})).map((replacement -> {
+  String upperCase = replacement.toUpperCase();
+  System.out.println(replacement + " becomes " + upperCase);
+  return upperCase;
+})).forEach(System.out::println);
+						</code></pre>
+					</section>
+					<section>
+						<h2>...values stream through one by one</h2>
+						<pre><code data-trim>
+// One becomes Oni
+// Oni becomes ONI
+// ONI
+// Two becomes Two
+// Two becomes TWO
+// TWO
+// Three becomes Thrii
+// Thrii becomes THRII
+// THRII
+						</code></pre>
+					</section>
+				</section>
+
+				
+				<section>
+					<h1>End of Session One</h1>
+					<p>Download the slides and examples!</p>
+					<small>
+						<a href="https://github.com/TassSinclair/NextGenJavaPresentation">
+							github.com/TassSinclair/NextGenJava</a>
+					</small>
+					<p>Try out next week's lambda tutorial!</p>
+					<small>
+						<a href="https://github.com/AdoptOpenJDK/lambda-tutorial">
+							github.com/AdoptOpenJDK/lambda-tutorial</a>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
