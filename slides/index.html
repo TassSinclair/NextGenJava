@@ -126,11 +126,11 @@ Predicate&lt;Collection&gt; isEmpty = Collection::isEmpty;
 						<p>(★) -><br />Recieve a value for output or transfer</p>
 						<pre><code data-trim>
 // Lambda function
-Consumer&lt;String&gt; consumer = (String s) -> System.out.println(s))
+Consumer&lt;String&gt; printOut = (String s) -> System.out.println(s))
 
 // Method reference
 List&lt;String&gt; myList = new ArrayList&lt;&gt;();
-Consumer&lt;String&gt; consumer = myList::add;
+Consumer&lt;String&gt; addToList = myList::add;
 						</code></pre>
 					</section>
 				</section>
@@ -175,7 +175,7 @@ coupons.stream() // Stream of coupons
   {
     segments.stream() // Stream of segments
       .filter(Segment::isFlight) // Predicate
-      .map((segment -> (FlightSegment) segment)) // Function
+      .map((segment) -> (FlightSegment) segment) // Function
       .filter(coupon::matchesFlightSegment) // Predicate
       .forEach(coupon::addFlightSegment); // Consumer
   });
@@ -186,15 +186,15 @@ coupons.stream() // Stream of coupons
 					<div class="fragment">
 						<p>with FEST</p>
 						<pre><code data-trim>
-assertThat(choiceBeans).extracting("choice")
-  .contains(Choice.keep, Choice.change, Choice.cancel);
+assertThat(choiceBeans).onProperty("choice")
+	.containsExactly(Choice.keep, Choice.change, Choice.cancel);
 						</code></pre>
 					</div>
 					<div class="fragment">
 						<p>with AspectJ</p>
 						<pre><code data-trim>
 assertThat(choiceBeans).extracting(ChoiceBean::getChoice)
-  .contains(Choice.keep, Choice.change, Choice.cancel);
+	.containsExactly(Choice.keep, Choice.change, Choice.cancel);
 						</code></pre>
 					</div>
 				</section>
