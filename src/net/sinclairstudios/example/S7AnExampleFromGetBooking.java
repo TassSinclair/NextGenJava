@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class S5AnExampleFromGetBooking {
+public class S7AnExampleFromGetBooking {
 
   public static void main(String... args) {
 

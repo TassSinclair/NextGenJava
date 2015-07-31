@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class S3AnatomyOfALambda {
+public class S5AnatomyOfALambda {
 
   public static void main(String... args) {
 

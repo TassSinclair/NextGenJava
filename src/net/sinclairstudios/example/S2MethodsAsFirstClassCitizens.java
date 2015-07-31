@@ -2,7 +2,7 @@ package net.sinclairstudios.example;
 
 import java.util.function.Function;
 
-public class S1MethodsAsFirstClassCitizens {
+public class S2MethodsAsFirstClassCitizens {
 
   public static void main(String... args) {
 

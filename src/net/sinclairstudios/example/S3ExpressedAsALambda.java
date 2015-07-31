@@ -2,7 +2,7 @@ package net.sinclairstudios.example;
 
 import java.util.function.Function;
 
-public class S2ExpressedAsALambda {
+public class S3ExpressedAsALambda {
 
   public static void main(String... args) {
 
