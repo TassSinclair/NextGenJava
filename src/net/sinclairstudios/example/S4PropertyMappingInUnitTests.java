@@ -1,7 +1,7 @@
 package net.sinclairstudios.example;
 
-import net.sinclairstudios.example.s7classes.Choice;
-import net.sinclairstudios.example.s7classes.ChoiceBean;
+import net.sinclairstudios.example.s8classes.Choice;
+import net.sinclairstudios.example.s8classes.ChoiceBean;
 
 import java.util.List;
 import java.util.stream.Collectors;

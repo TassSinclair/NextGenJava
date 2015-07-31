@@ -1,4 +1,4 @@
-package net.sinclairstudios.example.s7classes;
+package net.sinclairstudios.example.s8classes;
 
 public enum Choice {
 

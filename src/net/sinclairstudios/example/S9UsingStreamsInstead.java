@@ -8,7 +8,7 @@ import net.sinclairstudios.example.s5classes.Status;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class S8UsingStreamsInstead {
+public class S9UsingStreamsInstead {
 
   public static void main(String... args) {
 
