@@ -102,7 +102,7 @@ assertThat(choiceBeans).onProperty("choice")
 						</code></pre>
 					</div>
 					<div class="fragment">
-						<p>with AspectJ (method reference)</p>
+						<p>with AssertJ (method reference)</p>
 						<pre><code data-trim>
 assertThat(choiceBeans).extracting(ChoiceBean::getChoice)
 	.containsExactly(Choice.keep, Choice.change, Choice.cancel);
