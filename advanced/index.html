@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Next Gen Java III</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div class="reveal">
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Next Gen Java Pt. III</h1>
+					<img width="365" height="365" data-src="res/lambda.svg" alt="lambda icon" style="background: none; border: none; box-shadow: none; margin: 0">
+					<p>
+						Advanced stream manipulations
+					</p>
+					<p>
+						<small>Andrew Hamilton</small>
+					</p>
+				</section>
+				<section>
+					<h2>Agenda</h2>
+
+					<ol>
+						<li>Presentation
+							<ol>
+								<li>Flat-mapping</li>
+								<li>Summarising</li>
+								<li>Grouping</li>
+								<li>Collecting to Maps</li>
+							</ol>
+						</li>
+						<li>Q&amp;A and experimentation</li>
+					</ol>
+
+				</section>
+				<section>
+					<h2>Flat-mapping</h2>
+					<p>Join multiple streams together into a single stream.</p>
+					<pre><code data-trim>
+List&lt;List&lt;Integer&gt;&gt; multiList = Arrays.asList(
+    Arrays.asList(6), Arrays.asList(2, 4, 5), Arrays.asList(1, 3)
+);
+
+List&lt;Integer&gt; list = multiList.stream()
+    .flatMap(List::stream)
+    .collect(Collectors.toList()); // 6 2 4 5 1 3
+					</code></pre>
+				</section>
+				<section>
+					<h2>Flat-mapping walkthrough</h2>
+					<div class="fragment">
+						<pre><code data-trim>
+Collection&lt;JourneyLeg&gt; journeyLegs = getJourneyLegs();
+journeyLegs.stream()
+						</code></pre>
+						<span style="color:rgb(127, 159, 127);font-weight:bold;">[</span>★→★→★<span style="color:rgb(127, 159, 127);font-weight:bold;">]</span>
+					</div>
+					<div class="fragment">
+						<pre><code data-trim>
+&nbsp;&nbsp;&nbsp;&nbsp;.map((journeyLeg) -> journeyLeg.getJourneyFlights())
+						</code></pre>
+						<span style="color:rgb(127, 159, 127);font-weight:bold;">[</span><span style="border: rgb(204, 147, 147) 4px solid;padding: 0px 10px;border-radius: 10px;">★,★</span>→<span style="border: rgb(204, 147, 147) 4px solid;padding: 0px 10px;border-radius: 10px;">★</span>→<span style="border: rgb(204, 147, 147) 4px solid;padding: 0px 10px;border-radius: 10px;">★,★,★</span><span style="color:rgb(127, 159, 127);font-weight:bold;">]</span>
+					</div>
+					<div class="fragment">
+						<pre><code data-trim>
+&nbsp;&nbsp;&nbsp;&nbsp;.map((journeyFlightList) -> journeyFlightList.stream())
+						</code></pre>
+						<span style="color:rgb(127, 159, 127);font-weight:bold;">[[</span>★→★<span style="color:rgb(127, 159, 127);font-weight:bold;">]</span>→<span style="color:rgb(127, 159, 127);font-weight:bold;">[</span>★<span style="color:rgb(127, 159, 127);font-weight:bold;">]</span>→<span style="color:rgb(127, 159, 127);font-weight:bold;">[</span>★→★→★<span style="color:rgb(127, 159, 127);font-weight:bold;">]]</span>
+						<div class="fragment" style=" position:absolute;margin-top:-115px;width:100%;">
+							<img width="800" data-src="res/strikeout.svg" alt="lambda icon" style="background: none; border: none; box-shadow:none;margin:0;">
+						</div>
+					<div class="fragment">
+						<pre><code data-trim>
+&nbsp;&nbsp;&nbsp;&nbsp;.flatMap((journeyFlightList) -> journeyFlightList.stream())
+						</code></pre>
+						<span style="color:rgb(127, 159, 127);font-weight:bold;">[</span>★→★→★→★→★→★<span style="color:rgb(127, 159, 127);font-weight:bold;">]</span>
+					</div>
+				</section>
+				<section>
+					<h2>Flat-mapping example</h2>
+					<pre><code data-trim>
+Collection&lt;JourneyLeg&gt; journeyLegs = getJourneyLegs();
+
+List&lt;JourneyFlight&gt; journeyFlights = journeyLegs.stream()
+    .map(JourneyLeg::getJourneyFlights)
+    .flatMap(List::stream)
+    .collect(Collectors.toList());
+
+journeyFlights.forEach(System.out::println)
+
+// NZ123 (FLOWN)
+// NZ234 (FLOWN)
+// NZ345 (OK)
+// NZ456 (DISRUPTED)
+
+						</code></pre>
+				</section>
+				<section>
+					<h2>Summarising</h2>
+					<pre><code data-trim>
+boolean perfectJourney = journey.getJourneyLegs().stream()
+    .map(JourneyLeg::getJourneyFlights)
+    .flatMap(List::stream)
+    .allMatch(JourneyFlight::isFlown);
+
+boolean anyFlightsDisrupted = journey.getJourneyLegs().stream()
+    .flatMap((jl) -> jl.getJourneyFlights().stream())
+    .anyMatch((jf) -> jf.getStatus() == FlightStatus.DISRUPTED);
+					</code></pre>
+				</section>
+				<section>
+					<h2>Grouping</h2>
+					<p>Create a Map&lt;A, List&lt;B&gt;&gt;, grouping Bs based on A.</p>
+					<pre><code data-trim>
+List&lt;String&gt; strings = Arrays.asList("foo", "bar", "baz");
+
+Map&lt;Character, List&lt;String&gt;&gt; byFirstChar = strings.stream()
+    .collect(Collectors.groupingBy((s) -> s.charAt(0)));
+
+byFirstChar.forEach((c, s) -> System.out.println(c + ": " + s));
+
+// b: [bar, baz]
+// f: [foo]
+					</code></pre>
+				</section>
+				<section>
+					<h2>Grouping by a known value</h2>
+					<pre><code data-trim>
+Map&lt;Nationality, List&lt;Passenger&gt;&gt; byNationality = allPassengers
+    .stream()
+    .collect(Collectors.groupingBy(Passenger::getNationality));
+
+// NZ: [Fred Jones (46), Mary Jones (44), Kaylee Jones (10)]
+// AU: [Carson Jones (2)]
+					</code></pre>
+					<div class="fragment">
+						<h2>...or a calculated value</h2>
+					<pre><code data-trim>
+Map&lt;AgeGroup, List&lt;Passenger&gt;&gt; byAgeGroup = allPassengers
+    .stream()
+    .collect(Collectors.groupingBy((p) -> ageGroupFor(p.getAge())));
+
+// ADULT: [Fred Jones (46), Mary Jones (44)]
+// CHILD: [Kaylee Jones (10)]
+// INFANT: [Carson Jones (2)]
+					</code></pre>
+					</div>
+				</section>
+				<section>
+					<h2>Collecting to Map entries (1)</h2>
+					<p>Uses functions to derive a key and a value.</p>
+					<pre><code data-trim>
+Map&lt;String, FlightStatus&gt; codesAndStatuses = journeyFlights.stream()
+    .collect(Collectors.toMap(
+        (journeyFlight) -> journeyFlight.getCode(),
+        (journeyFlight) -> journeyFlight.getStatus()
+    ));
+					</code></pre>
+					<div class="fragment">
+						<p>...which could be method references.</p>
+						<pre><code data-trim>
+Map&lt;String, FlightStatus&gt; codesAndStatuses = journeyFlights.stream()
+    .collect(Collectors.toMap(
+        JourneyFlight::getCode, JourneyFlight::getStatus
+    ));
+       					</code></pre>
+					</div>
+				</section>
+				<section>
+					<h2>Collecting to Map entries (2)</h2>
+					<p>Using the original items as map keys</p>
+					<pre><code data-trim>
+Map&lt;JourneyFlight, FlightStatus&gt; toStatus = journeyFlights.stream()
+    .collect(Collectors.toMap(
+        Function.identity(),
+        JourneyFlight::getStatus
+    ));
+					</code></pre>
+				</section>
+				<section>
+					<h1>End of Session Three</h1>
+					<p>Download the slides and examples!</p>
+					<small>
+						<a href="https://github.com/TassSinclair/NextGenJavaPresentation">
+							github.com/TassSinclair/NextGenJava</a>
+					</small>
+					<p>Recommended reading</p>
+					<small>
+						<a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html">
+							docs.oracle.com/javase/8/docs/api/java/util/stream/Collectors.html</a>
+					</small>
+					<p>Try out last week's lambda tutorial!</p>
+					<small>
+						<a href="https://github.com/AdoptOpenJDK/lambda-tutorial">
+							github.com/AdoptOpenJDK/lambda-tutorial</a>
+					</small>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
