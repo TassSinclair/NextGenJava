@@ -5,22 +5,18 @@ import net.sinclairstudios.example.s5classes.FlightSegment;
 import net.sinclairstudios.example.s5classes.Segment;
 import net.sinclairstudios.example.s5classes.Status;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
-public class S8AnExampleFromGetBooking {
+public class AnExampleFromGetBooking {
 
   public static void main(String... args) {
 
-    Collection<Coupon> coupons = new ArrayList<>();
-    Collection<Segment> segments = new ArrayList<>();
-
-    for (Coupon coupon : coupons)
+    for (Coupon coupon : getCoupons())
     {
-      if (Status.VoidCp != coupon.getStatus())
+      if (coupon.getStatus() != Status.Void)
       {
-        for (Segment segment : segments)
+        for (Segment segment : getSegments())
         {
           if (segment.isFlight())
           {
@@ -33,5 +29,13 @@ public class S8AnExampleFromGetBooking {
         }
       }
     }
+  }
+
+  private static Collection<Segment> getSegments() {
+    return Collections.emptyList();
+  }
+
+  private static Collection<Coupon> getCoupons() {
+    return Collections.emptyList();
   }
 }

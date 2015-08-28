@@ -38,7 +38,7 @@ public class JourneyFlightMapper {
   private static void journeyFlightAndStatusesMap(Collection<JourneyFlight> journeyFlights) {
     Map<JourneyFlight, FlightStatus> flightsAndStatuses = journeyFlights.stream()
         .collect(Collectors.toMap(
-            Function.identity(),
+            jf -> jf,
             JourneyFlight::getStatus
         ));
     flightsAndStatuses.forEach((a, b) -> System.out.println(a + ", " + b));

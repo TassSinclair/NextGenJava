@@ -5,26 +5,37 @@ import net.sinclairstudios.example.s5classes.FlightSegment;
 import net.sinclairstudios.example.s5classes.Segment;
 import net.sinclairstudios.example.s5classes.Status;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
-public class S9UsingStreamsInstead {
+public class UsingStreamsInstead {
 
   public static void main(String... args) {
 
-    Collection<Coupon> coupons = new ArrayList<>();
-    Collection<Segment> segments = new ArrayList<>();
-
-    coupons.stream() // Stream of coupons
-        .filter((coupon) -> coupon.getStatus() != Status.VoidCp) // Predicate
+    getCoupons().stream() // Stream of coupons
+        .filter((coupon) -> coupon.getStatus() != Status.Void) // Predicate
         .forEach((coupon) -> // Consumer
         {
-          segments.stream() // Stream of segments
+          getSegments().stream() // Stream of segments
               .filter(Segment::isFlight) // Predicate
               .map((segment) -> (FlightSegment) segment) // Function
               .filter(coupon::matchesFlightSegment) // Predicate
               .forEach(coupon::addFlightSegment); // Consumer
         });
 
+
+    String s = String.valueOf(4);
+
+    int length = "pizza".length();
+
+    char charAt = "egg".charAt(1);
+  }
+
+  private static Collection<Segment> getSegments() {
+    return Collections.emptyList();
+  }
+
+  private static Collection<Coupon> getCoupons() {
+    return Collections.emptyList();
   }
 }

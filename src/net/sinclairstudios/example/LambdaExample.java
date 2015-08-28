@@ -9,21 +9,6 @@ public class LambdaExample {
 
     // Yeah, but why?
 
-    Day day = Day.FRI.getNextDayOfWeek();
-    if (day != null) {
-      System.out.println(day);
-    }
-
-    List<String> myList = new ArrayList<>();
-
-    Consumer<String> consumer = myList::add;
-
-    Optional.ofNullable(Day.SAT.getNextDayOfWeek())
-        .ifPresent((Day d) -> System.out.println(d));
-
-    Optional.ofNullable(Day.SAT.getNextDayOfWeek())
-        .ifPresent(System.out::println);
-
     Supplier<Double> random = () -> Math.random();
     Function<String, Integer> length = (String s) -> s.length();
 

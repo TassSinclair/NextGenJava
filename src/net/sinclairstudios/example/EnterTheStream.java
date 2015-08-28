@@ -2,7 +2,7 @@ package net.sinclairstudios.example;
 
 import java.util.Arrays;
 
-public class S7EnterTheStream {
+public class EnterTheStream {
 
   public static void main(String... args) {
 

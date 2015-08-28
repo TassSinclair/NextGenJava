@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class S5AnatomyOfALambda {
+public class AnatomyOfALambda {
 
   public static void main(String... args) {
 
@@ -16,8 +16,14 @@ public class S5AnatomyOfALambda {
 
     // A comparator that compares uppercase versions of each item
     list.sort((a, b) -> a.toUpperCase().compareTo(b.toUpperCase()));
+//    list.sort((a, b) -> a.compareTo(b));
 
-    list.forEach(System.out::print); // AaBCD
+//    list.forEach(System.out::print); // AaBCD
+//    list.forEach(System.out::print); // AaBCD
+    list.forEach(item -> {
+      String output = item + ", ";
+      System.out.print(output);
+    }); // A, a, B, C, D,
 
     functionsExample();
     predicatesExample();

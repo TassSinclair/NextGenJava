@@ -97,35 +97,61 @@ System.out.println(louder3.apply("String Three")); // STRING THREE
 					<div class="fragment">
 						<p>with FEST (reflection)</p>
 						<pre><code data-trim>
-assertThat(choiceBeans).onProperty("choice")
-	.containsExactly(Choice.keep, Choice.change, Choice.cancel);
+assertThat(people).onProperty("name")
+    .containsExactly("John", "Paul", "George", "Ringo");
 						</code></pre>
 					</div>
 					<div class="fragment">
 						<p>with AssertJ (method reference)</p>
 						<pre><code data-trim>
-assertThat(choiceBeans).extracting(ChoiceBean::getChoice)
-	.containsExactly(Choice.keep, Choice.change, Choice.cancel);
+assertThat(people).extracting(Person::getName)
+    .containsExactly("John", "Paul", "George", "Ringo");
 						</code></pre>
 					</div>
 				</section>
 				<section>
-					<section>
-						<h2>Anatomy of a Lambda</h2>
-						<ul>
-							<li>Basically an anonymous function.</li>
-							<li>Usually one line, but can be a full block.</li>
-							<li>Can take 0...n parameters.</li>
-							<li>Can return void or a value.</li>
-						</ul>
-						<pre><code data-trim>
+					<h2>Anatomy of a Lambda</h2>
+					<ul>
+						<li>Basically an anonymous function.</li>
+						<li>Usually one line, but can be a full block.</li>
+						<li>Can take 0...n parameters.</li>
+						<li>Can return void or a value.</li>
+					</ul>
+					<pre><code data-trim>
 List&lt;String&gt; list = Arrays.asList("C", "A", "a", "D", "B");
 
 // A comparator that compares uppercase versions of each item
 list.sort((a, b) -> a.toUpperCase().compareTo(b.toUpperCase()));
 
-list.forEach(System.out::print); // AaBCD
-						</code></pre>
+list.forEach(item -> {
+  String output = item + ", ";
+  System.out.print(output);
+}); // A, a, B, C, D,
+					</code></pre>
+				</section>
+				<section>
+					<h2>Method reference param handling</h2>
+					<pre><code data-trim>
+Function&lt;Boolean, String&gt; valueOfFunc = String::valueOf;
+System.out.println(valueOfFunc.apply(true)); // true
+					</code></pre>
+					<pre class="fragment"><code data-trim>
+Function&lt;String, Integer&gt; lengthFunc = String::length;
+System.out.println(lengthFunc.apply("pizza")); // 5
+					</code></pre>
+					<pre class="fragment"><code data-trim>
+String egg = "egg";
+Function&lt;Integer, Character&gt; charAtFunc = egg::charAt;
+System.out.println(charAtFunc.apply(1)); // g
+					</code></pre>
+					<pre class="fragment"><code data-trim>
+BiFunction&lt;String, Integer, Character&gt; charAtFunc = String::charAt;
+System.out.println(charAtFunc.apply("egg", 1)); // g
+					</code></pre>
+				</section>
+				<section>
+					<section>
+						<h2>Common types of lambda functions</h2>
 					</section>
 					<section>
 						<h2>Functions</h2>
@@ -166,10 +192,9 @@ Consumer&lt;String&gt; addToList = myList::add;
 				<section>
 					<h2>...so we have</h2>
 					<ul>
-						<li>Suppliers for providing input values</li>
 						<li>Predicates for assessing conditions</li>
 						<li>Functions for transforming values</li>
-						<li>Consumers for accepting output values</li>
+						<li>Consumers for receiving output values</li>
 					</ul>
 					<p>How can we chain them together?</p>
 				</section>
@@ -189,11 +214,11 @@ Arrays.asList("a1", "a2", "b1", "b2")
 				<section>
 					<h2>An example from GetBooking</h2>
 					<pre><code data-trim>
-for (Coupon coupon : coupons)
+for (Coupon coupon : getCoupons())
 {
-  if (Status.VoidCp != coupon.getStatus())
+  if (Status.Void != coupon.getStatus())
   {
-    for (Segment segment : segments)
+    for (Segment segment : getSegments())
     {
       if (segment.isFlight())
       {
@@ -211,11 +236,11 @@ for (Coupon coupon : coupons)
 				<section>
 					<h2>Using streams instead</h2>
 					<pre><code data-trim>
-coupons.stream() // Stream of coupons
-  .filter((coupon) -> coupon.getStatus() != Status.VoidCp) // Predicate
+getCoupons().stream() // Stream of coupons
+  .filter((coupon) -> coupon.getStatus() != Status.Void) // Predicate
   .forEach((coupon) -> // Consumer
   {
-    segments.stream() // Stream of segments
+    getSegments().stream() // Stream of segments
       .filter(Segment::isFlight) // Predicate
       .map((segment) -> (FlightSegment) segment) // Function
       .filter(coupon::matchesFlightSegment) // Predicate
