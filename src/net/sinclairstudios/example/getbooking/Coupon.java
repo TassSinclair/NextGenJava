@@ -1,4 +1,4 @@
-package net.sinclairstudios.example.s5classes;
+package net.sinclairstudios.example.getbooking;
 
 public class Coupon {
 
@@ -11,6 +11,5 @@ public class Coupon {
   };
 
   public void addFlightSegment(FlightSegment flightSegment) {
-
   }
 }

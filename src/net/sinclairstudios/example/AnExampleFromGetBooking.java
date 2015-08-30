@@ -1,9 +1,9 @@
 package net.sinclairstudios.example;
 
-import net.sinclairstudios.example.s5classes.Coupon;
-import net.sinclairstudios.example.s5classes.FlightSegment;
-import net.sinclairstudios.example.s5classes.Segment;
-import net.sinclairstudios.example.s5classes.Status;
+import net.sinclairstudios.example.getbooking.Coupon;
+import net.sinclairstudios.example.getbooking.FlightSegment;
+import net.sinclairstudios.example.getbooking.Segment;
+import net.sinclairstudios.example.getbooking.Status;
 
 import java.util.Collection;
 import java.util.Collections;

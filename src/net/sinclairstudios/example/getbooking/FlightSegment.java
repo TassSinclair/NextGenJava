@@ -1,4 +1,4 @@
-package net.sinclairstudios.example.s5classes;
+package net.sinclairstudios.example.getbooking;
 
 public class FlightSegment extends Segment {
 
